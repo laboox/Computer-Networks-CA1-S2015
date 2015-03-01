@@ -8,18 +8,19 @@
 
 int main(){
     string order;
-    cin>>order;
-    if(order=="Register"){
-        string SSN, user, pass, repass;
-        if(cin>>SSN>>user>>pass>>repass){
-            if(pass!=repass){
-                cout<<"passwords does not match!\n";
+    while(cin>>order){
+        if(order=="Register"){
+            string SSN, user, pass, repass;
+            if(cin>>SSN>>user>>pass>>repass){
+                if(pass!=repass){
+                    cout<<"passwords does not match!\n";
+                }else{
+                    cout<<"registering user.\n";
+                    registerUser(SSN, user, pass);
+                }
             }else{
-                cout<<"registering user.\n";
-                registerUser(SSN, user, pass);
+                cout<<"wronge input!\n";
             }
-        }else{
-            cout<<"wronge input!\n";
         }
     }
     return 0;

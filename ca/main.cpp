@@ -33,7 +33,7 @@ int main(){
         for( i=0; i<=max_fd ; i++){
             if(FD_ISSET(i , &read_fds)){
                 if(i==0){
-                    // input                    
+                    // input 
                 }
                 else if(i!=socketfd){
                     //client or server

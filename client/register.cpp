@@ -4,6 +4,7 @@
 */
 
 #include "register.h"
+#include "keys.h"
 
 int registerUser(string SSN, string user, string pass){
     cout<<"connecting to CA.\n";
@@ -18,4 +19,6 @@ int registerUser(string SSN, string user, string pass){
         cout<<"connecting failed!\n";
         return 1;
     }
+    KeyPair kp = getKeyPair(2048);
+    cout<<kp.pub<<endl<<kp.priv<<endl;
 }

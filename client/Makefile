@@ -2,7 +2,7 @@ include ../Makefile
 
 all: client.out
 client.out: main.o register.o
-	$(CC) *.o -o client.out $(CLIBS) 
+	$(CC) $(CFLAGS) *.o $(CLIBS) -o client.out
 main.o: main.cpp
 	$(CC) $(CFLAGS) -c main.cpp
 register.o: sock_client.o register.cpp register.h
