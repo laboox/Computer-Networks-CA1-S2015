@@ -150,8 +150,5 @@ if(decrypted_length == -1)
 }
 printf("Decrypted Text =%s\n",decrypted);
 printf("Decrypted Length =%d\n",decrypted_length);
- 
- 
- 
- 
+
 }
