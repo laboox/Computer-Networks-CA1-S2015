@@ -2,7 +2,7 @@ include ../Makefile
 
 all: ca.out
 ca.out: main.o
-	$(CC) $(CLIBS) *.o -o ca.out 
+	$(CC) *.o $(CLIBS) -o ca.out 
 main.o: main.cpp server.o
 	$(CC) $(CFLAGS) -c main.cpp
 server.o: server.cpp server.h

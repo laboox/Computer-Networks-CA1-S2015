@@ -8,6 +8,8 @@
 #include <cmath>
 #include <cstring>
 #include <unistd.h>
+#include <fstream>
+#include <map>
 
 #define CA_IP "localhost"
 #define CA_PORT "2015"

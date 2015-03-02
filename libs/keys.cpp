@@ -5,6 +5,12 @@
 
 #include "keys.h"
 
+class EncryptionException: public exception {} EncryptionEx;
+class DecryptionException: public exception {} DecryptionEx;
+class RSACreateException: public exception {} RSACreateEx;
+
+int padding = RSA_PKCS1_PADDING;
+
 KeyPair getKeyPair(int length){
     size_t pri_len;            // Length of private key
     size_t pub_len;            // Length of public key
@@ -43,3 +49,77 @@ KeyPair getKeyPair(int length){
     free(pub_key);
     return kp;
 }
+
+RSA * createRSA(const char * key,bool pub) 
+{ 
+    RSA *rsa= NULL; 
+    BIO *keybio ; 
+    keybio = BIO_new_mem_buf((void*)key, -1); 
+    if (keybio==NULL) 
+    { 
+        printf( "Failed to create key BIO\n"); 
+        return 0; 
+    } 
+    if(pub) 
+    { 
+        rsa = PEM_read_bio_RSA_PUBKEY(keybio, &rsa, NULL, NULL); 
+    } 
+    else 
+    { 
+        rsa = PEM_read_bio_RSAPrivateKey(keybio, &rsa, NULL, NULL); 
+    } 
+    if(rsa == NULL) 
+    { 
+        printf( "Failed to create RSA\n"); 
+    } 
+
+    return rsa;
+}
+
+int public_encrypt(unsigned char * data,int data_len,unsigned char * key, unsigned char *encrypted)
+{
+    RSA * rsa = createRSA((char*)key,1);
+    int result = RSA_public_encrypt(data_len,data,encrypted,rsa,padding);
+    return result;
+}
+
+int private_decrypt(unsigned char * enc_data,int data_len,unsigned char * key, unsigned char *decrypted)
+{
+    RSA * rsa = createRSA((char*)key,0);
+    int  result = RSA_private_decrypt(data_len,enc_data,decrypted,rsa,padding);
+    return result;
+}
+ 
+int private_encrypt(unsigned char * data,int data_len,const unsigned char * key, unsigned char *encrypted)
+{
+    RSA * rsa = createRSA((const char*)key,0);
+    int result = RSA_private_encrypt(data_len,data,encrypted,rsa,padding);
+    return result;
+}
+
+int private_encrypt(string data, const char * key, unsigned char *encrypted)
+{
+//    unsigned char dataArr[MAX_MSG_SIZE];
+//    memcpy(dataArr, data.c_str(), strlen(data.c_str())+1);
+    RSA * rsa = createRSA((char*)key,0);
+    int result = RSA_private_encrypt(strlen(data.c_str()),(unsigned char*)data.c_str(),encrypted,rsa,padding);
+    return result;
+}
+
+int public_decrypt(unsigned char * enc_data,int data_len,const char * key, unsigned char *decrypted)
+{
+    RSA * rsa = createRSA((char*)key,1);
+    int  result = RSA_public_decrypt(data_len,enc_data,decrypted,rsa,padding);
+    return result;
+}
+
+string public_decrypt(unsigned char * enc_data,int data_len,const char * key)
+{
+    unsigned char dataArr[MAX_MSG_SIZE];
+    memset(dataArr, 0 , sizeof(dataArr));
+    RSA * rsa = createRSA((char*)key,1);
+    int result = public_decrypt(enc_data, data_len, key, dataArr);
+    string ret = (char*) dataArr;
+    return ret;
+}
+

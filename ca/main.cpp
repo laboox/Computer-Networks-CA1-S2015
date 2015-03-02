@@ -5,11 +5,13 @@
 
 #include "Header.h"
 #include "server.h"
+#include "keys.h"
 
 int main(){
     int socketfd, socket_accept_fd, port_number,read_status,max_fd;
-    char buffer[256];
-    bzero(&buffer,256);
+    map <int, string> toUser;
+    char buffer[MAX_MSG_SIZE];
+    bzero(&buffer,MAX_MSG_SIZE);
     struct sockaddr_in server_address, client_address;
     fd_set server,read_fds;
     FD_ZERO(&server);
@@ -37,6 +39,17 @@ int main(){
                 }
                 else if(i!=socketfd){
                     //client or server
+                    unsigned char encMsg[MAX_MSG_SIZE];
+                    string user = toUser[i];
+                    string addr = "../users/"+addr+"_pub.pem";
+                    string pubkey;
+                    cout<<"reading public key!\n";
+                    ifstream pubReader(addr.c_str());
+                    pubReader>>pubkey;
+                    pubReader.close();
+                    int msgSize = read(i, encMsg, MAX_MSG_SIZE);
+                    string msg = public_decrypt(encMsg, msgSize, (const char*)pubkey.c_str());
+                    cout<<msg<<endl;
                 }
                 else{
                     //there is a new connection
@@ -49,11 +62,16 @@ int main(){
                     if(socket_accept_fd>max_fd)
                         max_fd = socket_accept_fd;
                     cout<<"new client connected.\n";
+                    read(socket_accept_fd,buffer,MAX_MSG_SIZE);
+                    //TODO check if user already exist
+                    toUser[socket_accept_fd] = buffer;
+                    sprintf(buffer,"OK");
+                    write(socket_accept_fd,buffer,strlen(buffer));
+                    cout<<"new user "<< toUser[socket_accept_fd] << " created!\n";
                 }
             }
         }//for
-        //check for entery file owner!!!
-    }
+    }//while
 
     return 0;
 }
