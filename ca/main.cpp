@@ -3,6 +3,7 @@
 * Created by Sina on Sun Mar  1 17:19:44 2015.
 */
 
+#include "sstream"
 #include "Header.h"
 #include "server.h"
 #include "keys.h"
@@ -39,17 +40,16 @@ int main(){
                 }
                 else if(i!=socketfd){
                     //client or server
-                    cout<<"message size: "<<MAX_MSG_SIZE<<endl;
                     unsigned char encMsg[MAX_MSG_SIZE];
                     string user = toUser[i];
                     string addr;
-                    addr += "../users/"+addr+"_pub.pem";
-                    cout<<"1\n";
-                    string pubkey;
+                    addr += "../users/"+user+"_pub.pem";
+                    stringstream pubkeystream;
                     cout<<"reading public key!\n";
                     ifstream pubReader(addr.c_str());
-                    pubReader>>pubkey;
+                    pubkeystream << pubReader.rdbuf();
                     pubReader.close();
+                    string pubkey = pubkeystream.str();
                     cout<<pubkey<<endl;
                     int msgSize = read(i, encMsg, MAX_MSG_SIZE);
                     string msg = public_decrypt(encMsg, msgSize, (const char*)pubkey.c_str());

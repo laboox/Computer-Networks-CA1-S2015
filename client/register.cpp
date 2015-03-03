@@ -37,7 +37,8 @@ int registerUser(string SSN, string user, string pass){
     pubWriter<<kp.pub;
     pubWriter.close();
     cout<<"public key writed to file.\n";
-//    RSA* rsa = createRSA(kp.priv.c_str(),false);
+    RSA* rsa = createRSA(kp.pub.c_str(),true);
+    cout<<"rsa creation: "<<rsa<<endl;
     unsigned char encMsg[MAX_MSG_SIZE];
     string msg = SSN+" "+user+" "+pass;
     cout<<"encrypting "<<msg<<endl;

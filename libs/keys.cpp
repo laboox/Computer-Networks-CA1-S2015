@@ -19,8 +19,14 @@ KeyPair getKeyPair(int length){
     char   *encrypt = NULL;    // Encrypted message
     char   *decrypt = NULL;    // Decrypted message
     char   *err;               // Buffer for any error messages
-
-    RSA *keypair = RSA_generate_key(length, 3, NULL, NULL);
+    BIGNUM* e;
+    e = BN_new();
+    BN_set_word(e, 65537);
+//    RSA *keypair = RSA_generate_key(length, 3, NULL, NULL);
+    RSA *keypair;
+    if(!RSA_generate_key_ex(keypair, length, e, NULL)){
+        cout<<"failed to create key pair!\n";
+    }
 
     BIO *pri = BIO_new(BIO_s_mem());
     BIO *pub = BIO_new(BIO_s_mem());

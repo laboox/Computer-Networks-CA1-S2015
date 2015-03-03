@@ -5,20 +5,76 @@
 #include <openssl/bio.h>
 #include <openssl/err.h>
 #include <stdio.h>
+#include <string>
+#include <cstdlib>
+#include <iostream>
+using namespace std;
  
 int padding = RSA_PKCS1_PADDING;
+
+class KeyPair{
+public:
+    string pub;
+    string priv;
+    BIO *priBio;
+    BIO *pubBio;
+    KeyPair(string Pub, string Priv): pub(Pub), priv(Priv) {}
+    KeyPair(BIO* Pub, BIO* Pri): priBio(Pri), pubBio(Pub) {}
+};
+
+
+KeyPair getKeyPair(int length){
+    size_t pri_len;            // Length of private key
+    size_t pub_len;            // Length of public key
+    char   *pri_key;           // Private key
+    char   *pub_key;           // Public key
+    char   *err;               // Buffer for any error messages
+
+    RSA *keypair = RSA_generate_key(length, 3, NULL, NULL);
+    if(keypair==NULL){
+        cout<<"fail to create RSA!\n";
+        exit(1);
+    }
+
+    BIO *pri = BIO_new(BIO_s_mem());
+    BIO *pub = BIO_new(BIO_s_mem());
+
+    PEM_write_bio_RSAPrivateKey(pri, keypair, NULL, NULL, 0, NULL, NULL);
+    PEM_write_bio_RSAPublicKey(pub, keypair);
+
+    pri_len = BIO_pending(pri);
+    pub_len = BIO_pending(pub);
+
+    pri_key = (char*)malloc(pri_len);
+    pub_key = (char*)malloc(pub_len);
+
+    BIO_read(pri, pri_key, pri_len);
+    BIO_read(pub, pub_key, pub_len);
+
+//    pri_key[pri_len] = '\0';
+//    pub_key[pub_len] = '\0';
+
+    KeyPair kp(pub_key, pri_key);
+    RSA_free(keypair);
+    BIO_free_all(pub);
+    BIO_free_all(pri);
+    free(pri_key);
+    free(pub_key);
+    return kp;
+}
  
-RSA * createRSA(unsigned char * key,int public)
+RSA * createRSA(unsigned char * key,int pub)
 {
     RSA *rsa= NULL;
     BIO *keybio ;
     keybio = BIO_new_mem_buf(key, -1);
+    cout<<"BIO created.\n";
     if (keybio==NULL)
     {
         printf( "Failed to create key BIO");
         return 0;
     }
-    if(public)
+    if(pub)
     {
         rsa = PEM_read_bio_RSA_PUBKEY(keybio, &rsa,NULL, NULL);
     }
@@ -28,7 +84,7 @@ RSA * createRSA(unsigned char * key,int public)
     }
     if(rsa == NULL)
     {
-        printf( "Failed to create RSA");
+        printf( "Failed to create RSA\n");
     }
  
     return rsa;
@@ -63,7 +119,7 @@ int public_decrypt(unsigned char * enc_data,int data_len,unsigned char * key, un
  
 void printLastError(char *msg)
 {
-    char * err = malloc(130);;
+    char * err = (char*)malloc(130);;
     ERR_load_crypto_strings();
     ERR_error_string(ERR_get_error(), err);
     printf("%s ERROR: %s\n",msg, err);
@@ -72,9 +128,9 @@ void printLastError(char *msg)
  
 int main(){
  
-  char plainText[2048/8] = "Hello this is Ravi"; //key length : 2048
- 
- char publicKey[]="-----BEGIN PUBLIC KEY-----\n"\
+  unsigned char plainText[2048/8] = "Hello this is Ravi"; //key length : 2048
+/* 
+ unsigned char publicKey[]="-----BEGIN PUBLIC KEY-----\n"\
 "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy8Dbv8prpJ/0kKhlGeJY\n"\
 "ozo2t60EG8L0561g13R29LvMR5hyvGZlGJpmn65+A4xHXInJYiPuKzrKUnApeLZ+\n"\
 "vw1HocOAZtWK0z3r26uA8kQYOKX9Qt/DbCdvsF9wF8gRK0ptx9M6R13NvBxvVQAp\n"\
@@ -84,7 +140,7 @@ int main(){
 "wQIDAQAB\n"\
 "-----END PUBLIC KEY-----\n";
   
- char privateKey[]="-----BEGIN RSA PRIVATE KEY-----\n"\
+ unsigned char privateKey[]="-----BEGIN RSA PRIVATE KEY-----\n"\
 "MIIEowIBAAKCAQEAy8Dbv8prpJ/0kKhlGeJYozo2t60EG8L0561g13R29LvMR5hy\n"\
 "vGZlGJpmn65+A4xHXInJYiPuKzrKUnApeLZ+vw1HocOAZtWK0z3r26uA8kQYOKX9\n"\
 "Qt/DbCdvsF9wF8gRK0ptx9M6R13NvBxvVQApfc9jB9nTzphOgM4JiEYvlV8FLhg9\n"\
@@ -110,13 +166,26 @@ int main(){
 "yINRAoGBAJqioYs8rK6eXzA8ywYLjqTLu/yQSLBn/4ta36K8DyCoLNlNxSuox+A5\n"\
 "w6z2vEfRVQDq4Hm4vBzjdi3QfYLNkTiTqLcvgWZ+eX44ogXtdTDO7c+GeMKWz4XX\n"\
 "uJSUVL5+CVjKLjZEJ6Qc2WZLl94xSwL71E41H4YciVnSCQxVc4Jw\n"\
-"-----END RSA PRIVATE KEY-----\n";
- 
-    
+"-----END RSA PRIVATE KEY-----\n";*/
+
+KeyPair kp = getKeyPair(2048);
+cout<<kp.pub<<kp.priv<<endl;
+
+unsigned char* publicKey = (unsigned char*)malloc(strlen(kp.pub.c_str())+1);
+unsigned char* privateKey = (unsigned char*)malloc(strlen(kp.priv.c_str())+1);
+//publicKey = (unsigned char*)kp.pub.c_str();
+//privateKey = (unsigned char*)kp.priv.c_str();
+
+memcpy(publicKey, kp.pub.c_str(), strlen(kp.pub.c_str())+1);
+memcpy(privateKey, kp.priv.c_str(), strlen(kp.priv.c_str())+1);
+
+cout<<publicKey<<privateKey;
+cout<<"movement\n"; 
+
 unsigned char  encrypted[4098]={};
 unsigned char decrypted[4098]={};
  
-int encrypted_length= public_encrypt(plainText,strlen(plainText),publicKey,encrypted);
+int encrypted_length= public_encrypt(plainText,strlen((const char*)plainText),publicKey,encrypted);
 if(encrypted_length == -1)
 {
     printLastError("Public Encrypt failed ");
@@ -134,7 +203,7 @@ printf("Decrypted Text =%s\n",decrypted);
 printf("Decrypted Length =%d\n",decrypted_length);
  
  
-encrypted_length= private_encrypt(plainText,strlen(plainText),privateKey,encrypted);
+encrypted_length= private_encrypt(plainText,strlen((const char*)plainText),privateKey,encrypted);
 if(encrypted_length == -1)
 {
     printLastError("Private Encrypt failed");
