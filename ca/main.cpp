@@ -39,14 +39,18 @@ int main(){
                 }
                 else if(i!=socketfd){
                     //client or server
+                    cout<<"message size: "<<MAX_MSG_SIZE<<endl;
                     unsigned char encMsg[MAX_MSG_SIZE];
                     string user = toUser[i];
-                    string addr = "../users/"+addr+"_pub.pem";
+                    string addr;
+                    addr += "../users/"+addr+"_pub.pem";
+                    cout<<"1\n";
                     string pubkey;
                     cout<<"reading public key!\n";
                     ifstream pubReader(addr.c_str());
                     pubReader>>pubkey;
                     pubReader.close();
+                    cout<<pubkey<<endl;
                     int msgSize = read(i, encMsg, MAX_MSG_SIZE);
                     string msg = public_decrypt(encMsg, msgSize, (const char*)pubkey.c_str());
                     cout<<msg<<endl;
