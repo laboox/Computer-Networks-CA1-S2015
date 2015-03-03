@@ -5,9 +5,9 @@
 
 #include "Candidate.h"
 
-Candidate::Candidate (string Name, int Num){
-    name = Name;
-    num = Num;
+Candidate::Candidate (string name, int code) {
+    this.name = name;
+    this.code = code;
     votes = 0;
 }
 
@@ -15,10 +15,11 @@ void Candidate::save () {
     string addr = path + name + ".txt";
     ifstream file(addr);
     file<<name<<endl;
-    file<<num<<endl;
-    file<<vote<<endl;
+    file<<code<<endl;
+    file<<votes<<endl;
     file.close();
 }
+
 
 void Candidate::incVote () {
     vote++;
@@ -28,6 +29,6 @@ int Candidate::getVote () {
     return vote;
 }
 
-int Candidate::setVote (int Vote) {
-    vote = Vote;
+int Candidate::setVote (int vote) {
+    this.vote = vote;
 }

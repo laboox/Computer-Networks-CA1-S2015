@@ -5,6 +5,7 @@
 
 #include "register.h"
 #include "keys.h"
+#include "sock_client.h"
 #define BUF_SIZE 256
 
 int registerUser(string SSN, string user, string pass){

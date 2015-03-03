@@ -4,8 +4,6 @@
 */
 
 #include "Header.h"
-#include "server.h"
-#include "keys.h"
 
 int main(){
     int socketfd, socket_accept_fd, port_number,read_status,max_fd;
