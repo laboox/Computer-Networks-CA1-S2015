@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <fstream>
 #include <map>
+#include <sstream>
 
 #define CA_IP "localhost"
 #define CA_PORT "2015"

@@ -3,7 +3,6 @@
 * Created by Sina on Sat Feb 28 17:47:50 2015.
 */
 
-#include "Header.h"
 #include "register.h"
 
 int main(){

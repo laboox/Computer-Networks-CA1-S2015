@@ -4,8 +4,6 @@
 */
 
 #include "register.h"
-#include "keys.h"
-#include "sock_client.h"
 #define BUF_SIZE 256
 
 int registerUser(string SSN, string user, string pass){
@@ -16,7 +14,7 @@ int registerUser(string SSN, string user, string pass){
 
     int sockfd;
     try{
-        client_connect(ip,port,&sockfd);
+        connect(ip,port,&sockfd);
         cout<<"connection stablised!\n";
     }
     catch(exception& e){
