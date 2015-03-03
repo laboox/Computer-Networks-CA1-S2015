@@ -12,13 +12,13 @@
 class Candidate{
 private:
     string name;
-    int num;
+    int code;
     int votes;
 
 public:
-    Candidate ( string, int );
+    Candidate (string name, int code);
     void save ();
     void incVote();
-    void setVote (int);
+    void setVote (int vote);
     int getVote ();
 };
