@@ -19,20 +19,14 @@ KeyPair getKeyPair(int length){
     char   *encrypt = NULL;    // Encrypted message
     char   *decrypt = NULL;    // Decrypted message
     char   *err;               // Buffer for any error messages
-    BIGNUM* e;
-    e = BN_new();
-    BN_set_word(e, 65537);
-//    RSA *keypair = RSA_generate_key(length, 3, NULL, NULL);
-    RSA *keypair;
-    if(!RSA_generate_key_ex(keypair, length, e, NULL)){
-        cout<<"failed to create key pair!\n";
-    }
+
+    RSA *keypair = RSA_generate_key(length, 3, NULL, NULL);
 
     BIO *pri = BIO_new(BIO_s_mem());
     BIO *pub = BIO_new(BIO_s_mem());
 
     PEM_write_bio_RSAPrivateKey(pri, keypair, NULL, NULL, 0, NULL, NULL);
-    PEM_write_bio_RSAPublicKey(pub, keypair);
+    PEM_write_bio_RSA_PUBKEY(pub, keypair);
 
     pri_len = BIO_pending(pri);
     pub_len = BIO_pending(pub);
@@ -89,7 +83,7 @@ int public_encrypt(unsigned char * data,int data_len,unsigned char * key, unsign
     return result;
 }
 
-int private_decrypt(unsigned char * enc_data,int data_len,unsigned char * key, unsigned char *decrypted)
+int private_decrypt(unsigned char * enc_data,int data_len,const char * key, unsigned char *decrypted)
 {
     RSA * rsa = createRSA((char*)key,0);
     int  result = RSA_private_decrypt(data_len,enc_data,decrypted,rsa,padding);
@@ -129,3 +123,41 @@ string public_decrypt(unsigned char * enc_data,int data_len,const char * key)
     return ret;
 }
 
+int public_encrypt(string data, const char * key, unsigned char *encrypted)
+{
+    RSA * rsa = createRSA((char*)key,1);
+    int result = RSA_public_encrypt(strlen(data.c_str()),(unsigned char*)data.c_str(),encrypted,rsa,padding);
+    return result;
+}
+
+string private_decrypt(unsigned char * enc_data,int data_len,const char * key)
+{
+    unsigned char dataArr[MAX_MSG_SIZE];
+    memset(dataArr, 0 , sizeof(dataArr));
+    RSA * rsa = createRSA((char*)key,0);
+    int result = private_decrypt(enc_data, data_len, key, dataArr);
+    string ret = (char*) dataArr;
+    return ret;
+}
+
+string reciveAndDec(int sockfd, bool isPub, const KeyPair& kp){
+    unsigned char encMsg[MAX_MSG_SIZE] = {};
+    int encSize = read(sockfd, encMsg, MAX_MSG_SIZE);
+    string ret;
+    if(!isPub)
+        ret = private_decrypt(encMsg, encSize, kp.priv.c_str());
+    else
+        ret = public_decrypt(encMsg, encSize, kp.pub.c_str());
+    return ret;
+}
+
+void encAndSend(int sockfd, bool isPub, string msg, const KeyPair& kp){
+    unsigned char encMsg[MAX_MSG_SIZE] = {};
+    int encSize;
+    if(!isPub)
+        encSize = private_encrypt(msg, kp.priv.c_str(), encMsg);
+    else
+        encSize = public_encrypt(msg, kp.pub.c_str(), encMsg);
+        
+    write(sockfd, encMsg, encSize);
+}

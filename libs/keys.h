@@ -17,6 +17,8 @@ public:
     string pub;
     string priv;
     KeyPair(string Pub, string Priv): pub(Pub), priv(Priv) {}
+    KeyPair() {};
+    void setPub(string Pub){ pub = Pub; };
 };
 
 KeyPair getKeyPair(int);
@@ -31,3 +33,7 @@ int private_encrypt(string data,const char * key, unsigned char *encrypted);
 
 int public_decrypt(unsigned char * enc_data,int data_len,unsigned char * key, unsigned char *decrypted);
 string public_decrypt(unsigned char * enc_data,int data_len,const char * key);
+int public_encrypt(string data, const char * key, unsigned char *encrypted);
+string private_decrypt(unsigned char * enc_data,int data_len,const char * key);
+void encAndSend(int sockfd, bool isPub, string msg,const KeyPair& kp);
+string reciveAndDec(int sockfd, bool isPub, const KeyPair& kp);

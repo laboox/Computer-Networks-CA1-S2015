@@ -5,10 +5,12 @@
 
 #include "sstream"
 #include "Header.h"
+#include "user.h"
 
 int main(){
     int socketfd, socket_accept_fd, port_number,read_status,max_fd;
     map <int, string> toUser;
+    vector<User> users;
     char buffer[MAX_MSG_SIZE];
     bzero(&buffer,MAX_MSG_SIZE);
     struct sockaddr_in server_address, client_address;
@@ -48,10 +50,32 @@ int main(){
                     pubkeystream << pubReader.rdbuf();
                     pubReader.close();
                     string pubkey = pubkeystream.str();
-                    cout<<pubkey<<endl;
+                    
+                    KeyPair kp;
+                    kp.setPub(pubkey);
+
                     int msgSize = read(i, encMsg, MAX_MSG_SIZE);
                     string msg = public_decrypt(encMsg, msgSize, (const char*)pubkey.c_str());
-                    cout<<msg<<endl;
+                    User newUser(msg);
+                    if(!isUserExist(users, newUser)){
+                        encAndSend(i,true,"User Already Exists", kp);
+                    }else{
+                        cout<<"registering user.\n";
+                        encAndSend(i,true,"OK", kp);
+                        string ret = reciveAndDec(i, true, kp);
+                        if(ret=="sendme"){
+                            //TODO send certificate
+                            cout<<"generating certificate.\n";
+                            cout<<"sending certificate!\n";
+
+                            users.push_back(newUser);
+                            cout<<"user registered\n";
+                        }
+                        else{
+                            cout<<"something unknown went wrong!\n";
+                        }
+                    }
+                    //cout<<msg<<endl;
                 }
                 else{
                     //there is a new connection

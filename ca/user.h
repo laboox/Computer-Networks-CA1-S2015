@@ -1,0 +1,22 @@
+/**
+* File "user.h"
+* Created by Sina on Tue Mar  3 17:22:55 2015.
+*/
+
+#pragma once
+
+#include "Header.h"
+
+class User{
+private:
+    string uname;
+    string pass;
+    string SSN;
+public:
+    User(string Uname, string Pass, string sSN): uname(Uname), pass(Pass), SSN(sSN) {}
+    User(string msg);
+    string getUname() { return uname; }
+    string getSSN () { return SSN; }
+};
+
+bool isUserExist(vector<User>& users, User user);
