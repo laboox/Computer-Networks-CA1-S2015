@@ -12,11 +12,16 @@ private:
     string uname;
     string pass;
     string SSN;
+    string cer;
 public:
     User(string Uname, string Pass, string sSN): uname(Uname), pass(Pass), SSN(sSN) {}
     User(string msg);
     string getUname() { return uname; }
     string getSSN () { return SSN; }
+    string getPass() { return pass; }
+    string getCer();
+    bool checkCer(string cmp) { return cer==cmp; }
+    void setCer(string Cer) { cer = Cer; }
 };
 
 bool isUserExist(vector<User>& users, User user);

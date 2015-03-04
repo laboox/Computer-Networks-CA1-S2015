@@ -50,6 +50,6 @@ void build_server(int socketfd, struct sockaddr_in *server_address, int port_num
 	if (bind(socketfd, (struct sockaddr *) server_address, sizeof(*server_address)) ==-1){ 
 		failure("binding has problem!\n");
     }
-	if(listen(socketfd,5)==-1)
+	if(listen(socketfd,7)==-1)
 		failure("problem in listening!");
 }

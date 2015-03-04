@@ -15,6 +15,8 @@ int main(){
     bzero(&buffer,MAX_MSG_SIZE);
     struct sockaddr_in server_address, client_address;
     fd_set server,read_fds;
+    KeyPair cakp = getKeyPair(2048);
+
     FD_ZERO(&server);
     FD_ZERO(&read_fds);
     port_number = atoi(CA_PORT);
@@ -59,15 +61,16 @@ int main(){
                     User newUser(msg);
                     if(!isUserExist(users, newUser)){
                         encAndSend(i,true,"User Already Exists", kp);
+                        cout<<"user does not registered!\n";
                     }else{
                         cout<<"registering user.\n";
                         encAndSend(i,true,"OK", kp);
                         string ret = reciveAndDec(i, true, kp);
                         if(ret=="sendme"){
-                            //TODO send certificate
                             cout<<"generating certificate.\n";
+                            string cer = user.getCer();
                             cout<<"sending certificate!\n";
-
+                            endAndSend(i, false, cer, cakp);
                             users.push_back(newUser);
                             cout<<"user registered\n";
                         }
@@ -75,7 +78,8 @@ int main(){
                             cout<<"something unknown went wrong!\n";
                         }
                     }
-                    //cout<<msg<<endl;
+                    close(i);
+                    FD_CLR(i,&server);
                 }
                 else{
                     //there is a new connection
@@ -101,3 +105,4 @@ int main(){
 
     return 0;
 }
+
