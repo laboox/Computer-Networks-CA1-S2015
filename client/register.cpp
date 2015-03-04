@@ -26,7 +26,7 @@ int registerUser(string SSN, string user, string pass, vector<user>& users){
     //cout<<buffer<<endl;
     if(strcmp(buffer,"OK")){
         cout<<buffer<<endl;
-        return 1;
+        return 0;
     }
     string addr;
     addr += "../users/"+user+"_pub.pem"; 
@@ -50,9 +50,12 @@ int registerUser(string SSN, string user, string pass, vector<user>& users){
     if(ans == "OK"){
         encAndSend(sockfd, false, "sendme", kp);
         string cer = reviceAndDec(sockfd, false, kp);
+        cout<<"certificate:\n"<<cer<<endl;
         User user(uname, pass, ssn);
         user.setCer(cer);
+        user.setKP(kp);
         users.push_back(user);
+        return 1;
     }
     else{
         cout<<ans<<endl;

@@ -5,6 +5,7 @@
 
 #include "register.h"
 #include "user.h"
+#define ADMINPASS "123456"
 
 bool regUser(string uname, vector<User>& users){
     for(int i=0;i<users.size();i++){
@@ -25,9 +26,11 @@ User* getUser(string uname, vector<User>& users){
 int main(){
     string order;
     vector<user> users;
-    User* user;
+    int sockfd = -1;
+    char buffer[MAX_MSG_SIZE] = {};
 
     while(cin>>order){
+        bzero(&buffer, MAX_MSG_SIZE);
         if(order=="Register"){
             string SSN, user, pass, repass;
             if(cin>>SSN>>user>>pass>>repass){
@@ -35,7 +38,12 @@ int main(){
                     cout<<"passwords does not match!\n";
                 }else{
                     cout<<"registering user.\n";
-                    registerUser(SSN, user, pass, users);
+                    int res = registerUser(SSN, user, pass, users);
+                    if(res){
+                        cout<<"user registered successfully.\n";
+                    }else{
+                        cout<<"failed to register user!\n";
+                    }
                 }
             }else{
                 cout<<"wronge input!\n";
@@ -44,27 +52,83 @@ int main(){
             int serverPort;
             string uname;
             cin>>serverPort>>uname;
-            if(uname=="Admin" || regUser(uname, users)){
-                //TODO do sth for Admin
-                user = getUser(uname, users);
-                //TODO connect user to server 
+            if(uname=="Admin" && sockfd==-1){
+                try{
+                    connect(ip,port,&sockfd);
+                    cout<<"connection stablised!\n";
+                }
+                catch(exception& e){
+                    cout<<"connecting failed!\n";
+                    sockfd = -1;
+                }
+            }else if(sockfd!=-1){
+                cout<<"you already connected!\n";
             }else{
-                cout<<"you didn't registered from this client!\n";
+                cout<<"you'r not Admin!\n";
             }
         } else if(order=="Show" && cin>>order && order=="Candidate"){
-            if(user==null){
+            if(sockfd == -1){
                 cout<<"you'r not connected yet!\n";
             }else{
+                send_message("ShowCandidate",sockfd);
+                read(sockfd, buffer, MAX_MSG_SIZE);
+                cout<<buffer<<endl;
             }
         } else if(order=="Vote"){
-            if(user==null){
+            string uname;
+            string canNum;
+            cin>>uname>>canNum;
+            if(sockfd==-1){
                 cout<<"you'r not connected yet!\n";
             }else{
+                if(regUser(uname, users)){
+                    User* user = getUser(uname, users);
+                    send_message("Vote",sockfd);
+                    read(sockfd, buffer, MAX_MSG_SIZE);
+                    if(!strcmp(buffer,"OK"){
+                        send_message(uname,sockfd);
+                        read(sockfd, buffer, MAX_MSG_SIZE);
+                        if(!strcmp(buffer,"OK"){
+                            encAndSend(sockfd, false, user->cer, user->kp);
+                            read(sockfd, buffer, MAX_MSG_SIZE);
+                            if(!strcmp(buffer, "OK")){
+                                endAndSend(sockfd, false, canNum, user->kp);
+                                read(sockfd, buffer, MAX_MSG_SIZE);
+                                if(!strcmp(buffer, "OK")){
+                                    cout<<"vote submitted!\n";
+                                }else{
+                                    cout<<buffer<<endl;
+                                }
+                            } else {
+                                cout<<"something went wrong.\n";
+                            }
+                        }
+                    }else{
+                        cout<<"something went wrong.\n";
+                    }
+                }else{
+                    cout<<"you'r not registered with this client.\n";
+                }
             }
         } else if(order=="Show" && cin>>order && order=="Log"){
-            if(user==null || user->getUname()!="Admin"){
-                cout<<"you'r not connected yet!\n";
+            string uname, pass;
+            cin>>uname>>pass;
+            if(uname!="Admin" || sockfd==-1 || pass!=ADMINPASS){
+                cout<<"you cant!\n";
             }else{
+                send_message("ShowLog",sockfd);
+                read(sockfd, buffer, MAX_MSG_SIZE);
+                cout<<buffer<<endl;
+            }
+        } else if(order=="Disconnect"){
+            string uname, pass;
+            cin>>uname>>pass;
+            if(uname!="Admin" || sockfd==-1 || pass!=ADMINPASS){
+                cout<<"you cant!\n";
+            }else{
+                send_message("DC",sockfd);
+                close(sockfd);
+                sockfd = -1;
             }
         }
     }

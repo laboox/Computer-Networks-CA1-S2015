@@ -32,7 +32,7 @@ void connect(char* ip, char* port, int* socketfd){
 
 void send_message(string message, int sockfd){
     string buff;
-    buff = message+"\n";
+    buff = message;
     if(buff.size()>MAX_BUFFER_SIZE)
         throw TooLongEx;
     int nwrite = write(sockfd, buff.c_str(), MAX_BUFFER_SIZE);

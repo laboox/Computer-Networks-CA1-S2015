@@ -13,6 +13,7 @@ private:
     string pass;
     string SSN;
     string cer;
+    KeyPair kp;
 public:
     User(string Uname, string Pass, string sSN): uname(Uname), pass(Pass), SSN(sSN) {}
     User(string msg);
@@ -22,6 +23,8 @@ public:
     string getCer();
     bool checkCer(string cmp) { return cer==cmp; }
     void setCer(string Cer) { cer = Cer; }
+    void setKP(const KeyPair& KP) { kp = KP; }
+    KeyPair getKP() { return kp; }
 };
 
 bool isUserExist(vector<User>& users, User user);
