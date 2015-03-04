@@ -25,7 +25,7 @@ User* getUser(string uname, vector<User>& users){
 
 int main(){
     string order;
-    vector<user> users;
+    vector<User> users;
     int sockfd = -1;
     char buffer[MAX_MSG_SIZE] = {};
 
@@ -54,7 +54,7 @@ int main(){
             cin>>serverPort>>uname;
             if(uname=="Admin" && sockfd==-1){
                 try{
-                    connect(ip,port,&sockfd);
+                    connect(SERVER_IP,SERVER_PORT,&sockfd);
                     cout<<"connection stablised!\n";
                 }
                 catch(exception& e){
@@ -85,14 +85,14 @@ int main(){
                     User* user = getUser(uname, users);
                     send_message("Vote",sockfd);
                     read(sockfd, buffer, MAX_MSG_SIZE);
-                    if(!strcmp(buffer,"OK"){
+                    if(!strcmp(buffer,"OK")){
                         send_message(uname,sockfd);
                         read(sockfd, buffer, MAX_MSG_SIZE);
-                        if(!strcmp(buffer,"OK"){
-                            encAndSend(sockfd, false, user->cer, user->kp);
+                        if(!strcmp(buffer,"OK")){
+                            encAndSend(sockfd, false, user->getCer(), user->getKP());
                             read(sockfd, buffer, MAX_MSG_SIZE);
                             if(!strcmp(buffer, "OK")){
-                                endAndSend(sockfd, false, canNum, user->kp);
+                                encAndSend(sockfd, false, canNum, user->getKP());
                                 read(sockfd, buffer, MAX_MSG_SIZE);
                                 if(!strcmp(buffer, "OK")){
                                     cout<<"vote submitted!\n";
@@ -102,7 +102,10 @@ int main(){
                             } else {
                                 cout<<"something went wrong.\n";
                             }
+                        } else {
+                            cout<<"something went wrong.\n";
                         }
+
                     }else{
                         cout<<"something went wrong.\n";
                     }

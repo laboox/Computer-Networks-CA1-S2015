@@ -6,7 +6,7 @@
 #include "register.h"
 #define BUF_SIZE 256
 
-int registerUser(string SSN, string user, string pass, vector<user>& users){
+int registerUser(string SSN, string user, string pass, vector<User>& users){
     cout<<"connecting to CA.\n";
     char port[] = CA_PORT;
     char ip[] = CA_IP;
@@ -49,12 +49,12 @@ int registerUser(string SSN, string user, string pass, vector<user>& users){
     string ans = private_decrypt((unsigned char*)buffer, encSize, (const char*)kp.priv.c_str());
     if(ans == "OK"){
         encAndSend(sockfd, false, "sendme", kp);
-        string cer = reviceAndDec(sockfd, false, kp);
+        string cer = reciveAndDec(sockfd, false, kp);
         cout<<"certificate:\n"<<cer<<endl;
-        User user(uname, pass, ssn);
-        user.setCer(cer);
-        user.setKP(kp);
-        users.push_back(user);
+        User nuser(user, pass, SSN);
+        nuser.setCer(cer);
+        nuser.setKP(kp);
+        users.push_back(nuser);
         return 1;
     }
     else{

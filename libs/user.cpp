@@ -20,16 +20,20 @@ User::User(string msg){
 }
 
 string User::getCer(){
-    time(&rawtime);
-    time_t rawtime;
-    struct tm * timeinfo;
-    stringstream ret;
+    if(cer==""){
+        time_t rawtime;
+        struct tm * timeinfo;
+        stringstream ret;
 
-    timeinfo = localtime (&rawtime);
-    
-    ret<<uname<<endl<<pass<<endl<<SSN<<endl<<timeinfo->tm_hour;
+        time(&rawtime);
+        timeinfo = localtime (&rawtime);
+        
+        ret<<uname<<endl<<pass<<endl<<SSN<<endl<<timeinfo->tm_hour;
 
-    cer = ret.str();
-
-    return ret.str();
+        cer = ret.str();
+        return ret.str();
+    }
+    else{
+        return cer;
+    }
 }

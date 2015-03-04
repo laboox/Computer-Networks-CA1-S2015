@@ -68,9 +68,9 @@ int main(){
                         string ret = reciveAndDec(i, true, kp);
                         if(ret=="sendme"){
                             cout<<"generating certificate.\n";
-                            string cer = user.getCer();
+                            string cer = newUser.getCer();
                             cout<<"sending certificate!\n";
-                            endAndSend(i, false, cer, cakp);
+                            encAndSend(i, false, cer, cakp);
                             users.push_back(newUser);
                             cout<<"user registered\n";
                         }

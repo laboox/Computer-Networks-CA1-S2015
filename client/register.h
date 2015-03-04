@@ -6,4 +6,5 @@
 #pragma once
 
 #include "Header.h"
-int registerUser(string, string, string, vector<user>& users);
+#include "user.h"
+int registerUser(string, string, string, vector<User>& users);
