@@ -2,7 +2,7 @@
 
 #include "Header.h"
 
-#define path "boxes/"
+#define path "Boxes/"
 
 class Box{
 private:
@@ -14,7 +14,7 @@ private:
 public:
     Box (int fd) : fileDescriptor(fd) {}
     void save ();
-    void vote(int candidateCode);
+    void vote(int candidateCode, string voter);
     void getVote (int candidateCode);
     vector<pii> getVotes ();
     vector<string> getVoters();

@@ -12,7 +12,7 @@ void Box::save () {
     file.close();
 }
 
-void Box::vote(int candidateCode)
+void Box::vote(int candidateCode, string voter)
 {
 	if(candidateCodes[candidateCode]==0)
 	{
@@ -21,8 +21,8 @@ void Box::vote(int candidateCode)
 	}
 	else
 		votes[candidateCodes[candidateCode]]++;
-
-	
+	voters.push_back(voter);
+	save();
 }
 
 void Box::getVote (int candidateCode)

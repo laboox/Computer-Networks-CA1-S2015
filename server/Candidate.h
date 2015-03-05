@@ -7,7 +7,7 @@
 
 #include "Header.h"
 
-#define path "candidates/"
+#define path "Candidates/"
 
 class Candidate{
 private:
@@ -19,7 +19,7 @@ public:
     Candidate (string name, int code);
     void save ();
     void incVote();
-    void setVote (int vote);
     int getVote ();
     int getCode();
+    string getName();
 };

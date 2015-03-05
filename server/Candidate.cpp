@@ -23,6 +23,7 @@ void Candidate::save () {
 
 void Candidate::incVote () {
     vote++;
+    save();
 }
 
 int Candidate::getVote () {
@@ -33,8 +34,9 @@ int Candidate::getCode () {
     return code;
 }
 
-int Candidate::setVote (int vote) {
-    this.vote = vote;
+string Candidate::getName () {
+    return name;
 }
+
 
 
