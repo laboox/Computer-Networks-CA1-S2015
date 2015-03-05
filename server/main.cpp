@@ -1,4 +1,5 @@
 #include "Header.h"
+#include "ElectionManager.h"
 
 int main(){
     int socketfd, socket_accept_fd, port_number,read_status,max_fd;
@@ -31,15 +32,19 @@ int main(){
                 if(box_fd==0){
                     string order;
                     getline(cin, order);
-                    parse(order);
+                    try{
+                        em.parseServerCmd(order);
+                    }catch(Exeption ex)
+                        cout<<ex.getErr()<<endl;
                 }
                 else if(box_fd!=socketfd){
-                    unsigned char command[MAX_MSG_SIZE];
-                    read(i, command, MAX_MSG_SIZE);
-                    parse(command.c_str());
+                    unsigned char order[MAX_MSG_SIZE];
+                    read(i, order, MAX_MSG_SIZE);
+                    string result=parseClientCmd(order.c_str(), box_fd);
+                    send_message(result, box_fd);
                 }
                 else{
-                    //there is a new connection
+                    
                     socklen_t client_address_size;
                     client_address_size = sizeof(client_address);
                     socket_accept_fd = accept(socketfd, (struct sockaddr *) &client_address, &client_address_size);
@@ -48,17 +53,11 @@ int main(){
                     FD_SET(socket_accept_fd,&server);
                     if(socket_accept_fd>max_fd)
                         max_fd = socket_accept_fd;
+                    
+                    em.addBox(socket_accept_fd);
                     cout<<"new election center connected.\n";
-                    read(socket_accept_fd,buffer,MAX_MSG_SIZE);
-                    //TODO check if user already exist
-                    clients[socket_accept_fd] = buffer;
-                    sprintf(buffer,"OK");
-                    write(socket_accept_fd,buffer,strlen(buffer));
-                    cout<<"new user "<< toUser[socket_accept_fd] << " connected!\n";
                 }
             }
-        }//for
-    }//while
-
-    return 0;
+        }
+    }
 }

@@ -12,4 +12,4 @@ private:
 public:
 	Exeption(string err): error(error) {};
 	string getErr() {return error;};
-}
+};

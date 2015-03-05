@@ -3,6 +3,7 @@
 #include "Header.h"
 #include "Box.h"
 #include "Candidate.h"
+#include "Time.h"
 
 #define BOX_FD first
 #define BOX_INDEX second
@@ -24,7 +25,13 @@ public:
 	void extendVotingTime(Time end_Time);
 
 	void addBox(int fd);
+	
 	string showCandidates();
 	void vote(string username, int candidateCode);
 	string showLog();
+
+	void parseServerCmd(string order);
+	string parseClientCmd(string order, int box_fd);
 };
+
+string int2str(int n);

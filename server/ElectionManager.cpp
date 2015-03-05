@@ -31,23 +31,23 @@ string ElectionManager::showAllResults()
 	
 void ElectionManager::setVotingTime(Time start_time, Time end_Time)
 {
-	if(! valid(start_time))
+	if(! start_time.valid())
 		cout<<"Invalid start_time"<<endl;
-	if(! valid(end_time))
+	if(! end_time.valid())
 		cout<<"Invalid end_time"<<endl;
-	if(! before(start_time, end_Time))
+	if(! start_time.before(end_Time))
 		cout<<"Start_time must be before end_time"<<endl;
-	this.start_time=start_time;
-	this.end_Time=end_Time;
+	this->start_time=start_time;
+	this->end_Time=end_Time;
 }
 	
 void ElectionManager::extendVotingTime(Time end_Time)
 {
-	if(! valid(end_time))
+	if(! end_time.valid())
 		cout<<"Invalid end_time"<<endl;
-	if(! before(this.end_Time, end_Time))
+	if(! this->end_Time.before(end_Time))
 		cout<<"New end_time must be after previous end_time"<<endl;
-	this.end_Time=end_Time;
+	this->end_Time=end_Time;
 }
 
 string ElectionManager::showCandidates()
@@ -65,6 +65,7 @@ void ElectionManager::vote(string voter, int candidateCode, int box_fd,
 	/*
 		check certificate with CA
 	*/
+
 	if(votedVoters.find(voter)!=votedVoters.end())
 		throw new Exeption(voter+" voted before.");
 	if(candidateCodes.find(candidateCode)==candidateCodes.end())
@@ -87,4 +88,77 @@ string ElectionManager::showLog(int box_fd);
 void ElectionManager::addBox(int fd)
 {
 	boxes.push_back(new Box(fd));
+}
+
+void ElectionManager::parseServerCmd(string order)
+{
+	stringstream ss(order);
+	string cmd;
+	ss>>cmd;
+	if(cmd=="Add")
+	{
+		string param1, candidateName;
+		int candidateCode;
+		if(ss>>param1>>candidateName>>candidateCode && param1=="Candidate")
+			addCandidate(candidateName, candidateCode);
+		else
+			throw new Exeption("Invalid Command");
+	}
+	else if(cmd=="Show")
+	{
+		string param1,param2;
+		if(ss>>param1>>param2 && param1=="All" && param2=="Results")
+			showAllResults();
+		else
+			throw new Exeption("Invalid Command");	
+	}
+	else if(cmd=="Set")
+	{
+		string param1,param2,time1,time2;
+		if(ss>>param1>>param2>>time1>>time2 && param1=="Voting" && param2=="Time")
+		{
+			Time t1=new Time(time1);
+			Time t2=new Time(time2);
+			setVotingTime(t1, t2);
+		}
+		else
+			throw new Exeption("Invalid Command");
+
+	}
+	else if(cmd=="Extend")
+	{
+		string param1,param2,_time;
+		if(ss>>param1>>param2>>_time && param1=="Voting" && param2=="Time")
+		{
+			Time t=new Time(_time);
+			extendVotingTime(t);
+		}
+		else
+			throw new Exeption("Invalid Command");
+	}
+	else 
+		throw new Exeption("Invalid Command")
+}
+
+void ElectionManager::parseClientCmd(string order, int box_fd)
+{
+	stringstream ss(order);
+	string cmd; ss>>cmd;
+	if(cmd=="ShowLog")
+		return ShowLog(box_fd);
+	else if(cmd=="ShowCandidates")
+		return ShowCandidates();
+	else if(cmd=="Vote")
+	{
+
+	}
+	else 
+		throw new Exeption("Invalid Command")
+}
+
+string int2str(int n)
+{
+	stringstream s;
+	s<<n;
+	return str(s);
 }
