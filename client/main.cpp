@@ -4,7 +4,6 @@
 */
 
 #include "register.h"
-#include "user.h"
 #define ADMINPASS "123456"
 
 bool regUser(string uname, vector<User>& users){
@@ -23,6 +22,7 @@ User* getUser(string uname, vector<User>& users){
     return NULL;
 }
 
+//TODO client can resive messages from server and show them or parse them
 int main(){
     string order;
     vector<User> users;
@@ -66,11 +66,11 @@ int main(){
             }else{
                 cout<<"you'r not Admin!\n";
             }
-        } else if(order=="Show" && cin>>order && order=="Candidate"){
+        } else if(order=="Show" && cin>>order && order=="Candidates"){
             if(sockfd == -1){
                 cout<<"you'r not connected yet!\n";
             }else{
-                send_message("ShowCandidate",sockfd);
+                send_message("ShowCandidates",sockfd);
                 read(sockfd, buffer, MAX_MSG_SIZE);
                 cout<<buffer<<endl;
             }

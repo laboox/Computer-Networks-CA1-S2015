@@ -12,6 +12,7 @@
 #include <fstream>
 #include <map>
 #include <sstream>
+#include <time.h> 
 
 #define CA_IP "localhost"
 #define CA_PORT "2015"
@@ -22,4 +23,9 @@
 #define CA_ASK_PORT "2014"
 #define CA_ASK_IP "localhost"
 
+#define CANDIDATE_CODE first
+#define CANDIDATE_VOTES second
 using namespace std;
+
+typedef pair<int, int> pii;
+

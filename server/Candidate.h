@@ -21,4 +21,5 @@ public:
     void incVote();
     void setVote (int vote);
     int getVote ();
+    int getCode();
 };

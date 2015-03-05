@@ -29,6 +29,12 @@ int Candidate::getVote () {
     return vote;
 }
 
+int Candidate::getCode () {
+    return code;
+}
+
 int Candidate::setVote (int vote) {
     this.vote = vote;
 }
+
+

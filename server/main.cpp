@@ -1,16 +1,5 @@
-/**
-* File "main.cpp"
-* Created by Sina on Sun Mar  1 17:19:44 2015.
-*/
-
 #include "Header.h"
-#include "server.h"
-#include "keys.h"
-#include "Candidate.h"
 
-map <int, string> clients;
-vector<Candidate> candidates;
-    
 int main(){
     int socketfd, socket_accept_fd, port_number,read_status,max_fd;
     char buffer[MAX_MSG_SIZE];
@@ -46,9 +35,8 @@ int main(){
                 }
                 else if(clinet_fd!=socketfd){
                     unsigned char command[MAX_MSG_SIZE];
-                    int msgSize = read(i, command, MAX_MSG_SIZE);
-                    string cmd=command.c_str();
-                    parse(cmd);
+                    read(i, command, MAX_MSG_SIZE);
+                    parse(command.c_str());
                 }
                 else{
                     //there is a new connection
