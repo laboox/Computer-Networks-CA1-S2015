@@ -8,10 +8,26 @@
 bool isUserExist(vector<User>& users, User user){
     for(int i=0;i<users.size();i++){
         if(users[i].getUname() == user.getUname() || users[i].getSSN() == user.getSSN() || user.getUname() == "Admin"){
-            return false;
+            return true;
         }
     }
-    return true;
+    return false;
+}
+
+bool isUserExist(vector<User>& users, string uname){
+    for(int i=0;i<users.size();i++){
+        if(users[i].getUname() == uname){
+            return true;
+        }
+    }
+    return false;
+}
+
+User& findUser(vector<User>& users, string uname){
+    for(int i=0;i<users.size();i++){
+        if(users[i].getUname() == uname)
+            return users[i];
+    }
 }
 
 User::User(string msg){

@@ -2,8 +2,6 @@
 
 #include "Header.h"
 
-#define path "Boxes/"
-
 class Box{
 private:
     int fileDescriptor;
@@ -18,6 +16,7 @@ public:
     int getVote (int candidateCode);
     vector<pii> getVotes ();
     vector<string> getVoters();
+    int getFD() { return fileDescriptor; }
 };
 
 

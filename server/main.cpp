@@ -9,18 +9,36 @@ int main(){
     fd_set server,read_fds;
     FD_ZERO(&server);
     FD_ZERO(&read_fds);
-    port_number = atoi(CA_PORT);
+    port_number = atoi(SERVER_PORT);
+    char port[] = CA_PORT;
+    char ip[] = CA_IP;
 
     socketfd = socket(AF_INET, SOCK_STREAM, 0);
     if (socketfd < 0) 
         failure("problem in openning socket!");
+    
+    int caSockfd;
+    try{
+        connect(ip,port,&caSockfd);
+        send_message("server", caSockfd);
+        read(caSockfd, buffer, MAX_MSG_SIZE);
+        if(strcmp("OK", buffer)){
+            cout<<"connection failed!\n";
+            return 1;
+        }
+        cout<<"connection to CA stablised!\n";
+    }
+    catch(exception& e){
+        cout<<"connecting to CA failed!\n";
+        return 1;
+    }
 
     build_server(socketfd, &server_address,port_number);
     FD_SET(0,&server);
     FD_SET(socketfd,&server);
     max_fd = socketfd;
 
-    ElectionManager em = new ElectionManager();
+    ElectionManager em;
     /* connect to ca*/
     while(1){
         read_fds = server;
@@ -34,14 +52,27 @@ int main(){
                     getline(cin, order);
                     try{
                         em.parseServerCmd(order);
-                    }catch(Exeption ex)
+                    }catch(Exeption ex){
                         cout<<ex.getErr()<<endl;
+                    }
                 }
                 else if(box_fd!=socketfd){
                     unsigned char order[MAX_MSG_SIZE];
-                    read(i, order, MAX_MSG_SIZE);
-                    string result=parseClientCmd(order.c_str(), box_fd);
-                    send_message(result, box_fd);
+                    read(box_fd, order, MAX_MSG_SIZE);
+                    try{
+                        if(!strcmp((char*)order,"DC")){
+                            close(box_fd);
+                            FD_CLR(box_fd, &server);
+                            cout<<"client disconnected!\n";
+                        } else {
+                            string result=em.parseClientCmd((const char*)order, box_fd, caSockfd);
+                            if(result!="")
+                                send_message(result, box_fd);
+                        }
+                    }catch(Exeption ex){
+                        cout<<ex.getErr()<<endl;
+                    }
+
                 }
                 else{
                     

@@ -13,6 +13,6 @@ class Exeption {
 private:
 	string error;
 public:
-	Exeption(string err): error(error) {};
-	string getErr() {return error;};
+	Exeption(string err): error(err) {};
+	string getErr() {return error;}
 };

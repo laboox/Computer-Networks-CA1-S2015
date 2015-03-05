@@ -1,7 +1,7 @@
 #include "Box.h"
 
 void Box::save () {
-    string addr=path + int2str(fileDescriptor) + ".txt";
+    string addr="Boxes/" + int2str(fileDescriptor) + ".txt";
     ofstream file(addr.c_str(), std::ofstream::out);
     for (int i = 0; i < votes.size(); i++)
     {

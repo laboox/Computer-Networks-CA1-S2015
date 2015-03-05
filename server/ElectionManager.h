@@ -11,12 +11,12 @@
 class ElectionManager{
 private:
     vector<Candidate> candidates;
-    vector<Boxes> boxes;
+    vector<Box> boxes;
     map<int, int> box_fds;
     map<string, bool> votedVoters;
     map<int, int> candidateCodes;
     Time start_time;
-    Time end_Time;
+    Time end_time;
 public:
 	ElectionManager();
 	void addCandidate(string candidateName, int candidateCode);
@@ -27,10 +27,10 @@ public:
 	void addBox(int fd);
 	
 	string showCandidates();
-	void vote(string username, int candidateCode);
-	string showLog();
+    void vote(string voter, int candidateCode, int box_fd);
+	string showLog(int box_fd);
 
 	void parseServerCmd(string order);
-	string parseClientCmd(string order, int box_fd);
+	string parseClientCmd(string order, int box_fd, int ca_fd);
 };
 

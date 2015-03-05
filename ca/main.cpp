@@ -12,11 +12,11 @@ int main(){
     map <int, string> toUser;
     vector<User> users;
     char buffer[MAX_MSG_SIZE];
+    int serverFD = -1;
     bzero(&buffer,MAX_MSG_SIZE);
     struct sockaddr_in server_address, client_address;
     fd_set server,read_fds;
     KeyPair cakp = getKeyPair(2048);
-
     FD_ZERO(&server);
     FD_ZERO(&read_fds);
     port_number = atoi(CA_PORT);
@@ -40,37 +40,64 @@ int main(){
                 if(i==0){
                     // input 
                 }
+                else if(i==serverFD){
+                    //server
+                    read(i, buffer, MAX_MSG_SIZE);
+                    string uname = buffer;
+                    if(isUserExist(users, uname)){
+                        User user = findUser(users, uname);
+                        send_message("OK",i);
+                        string cer = reciveAndDec(i, false, cakp);
+                        if(user.checkCer(cer)){
+                            send_message("OK", i);
+                        } else {
+                            send_message("certificates does not match.", i);
+                        }
+                    } else {
+                        send_message("no such user.", i);
+                    }
+                }
                 else if(i!=socketfd){
-                    //client or server
+                    //client
                     unsigned char encMsg[MAX_MSG_SIZE];
-                    string user = toUser[i];
+                    read(i, buffer, MAX_MSG_SIZE);
+                    string user = buffer;
                     string addr;
                     addr += "../users/"+user+"_pub.pem";
                     stringstream pubkeystream;
-                    cout<<"reading public key!\n";
+                    cout<<"reading public key: "<<addr<<"\n";
                     ifstream pubReader(addr.c_str());
                     pubkeystream << pubReader.rdbuf();
                     pubReader.close();
                     string pubkey = pubkeystream.str();
+                    if(pubkey!=""){
+                        send_message("OK", i);
+                    }
+                    else{
+                        send_message("public key not found\n", i);
+                        continue;
+                    }
                     
                     KeyPair kp;
                     kp.setPub(pubkey);
 
-                    int msgSize = read(i, encMsg, MAX_MSG_SIZE);
-                    string msg = public_decrypt(encMsg, msgSize, (const char*)pubkey.c_str());
+                    string msg = reciveAndDec(i, true, kp);
+                    cout<<msg<<endl;
                     User newUser(msg);
-                    if(!isUserExist(users, newUser)){
+                    if(isUserExist(users, newUser)){
                         encAndSend(i,true,"User Already Exists", kp);
                         cout<<"user does not registered!\n";
                     }else{
                         cout<<"registering user.\n";
-                        encAndSend(i,true,"OK", kp);
+                        //encAndSend(i, true, "OK", kp);
+                        send_message("OK", i);
+
                         string ret = reciveAndDec(i, true, kp);
                         if(ret=="sendme"){
                             cout<<"generating certificate.\n";
                             string cer = newUser.getCer();
                             cout<<"sending certificate!\n";
-                            encAndSend(i, false, cer, cakp);
+                            encAndSend(i, true, cer, cakp);
                             users.push_back(newUser);
                             cout<<"user registered\n";
                         }
@@ -78,8 +105,6 @@ int main(){
                             cout<<"something unknown went wrong!\n";
                         }
                     }
-                    close(i);
-                    FD_CLR(i,&server);
                 }
                 else{
                     //there is a new connection
@@ -91,13 +116,14 @@ int main(){
                     FD_SET(socket_accept_fd,&server);
                     if(socket_accept_fd>max_fd)
                         max_fd = socket_accept_fd;
-                    cout<<"new client connected.\n";
                     read(socket_accept_fd,buffer,MAX_MSG_SIZE);
-                    //TODO check if user already exist
-                    toUser[socket_accept_fd] = buffer;
-                    sprintf(buffer,"OK");
-                    write(socket_accept_fd,buffer,strlen(buffer));
-                    cout<<"new user "<< toUser[socket_accept_fd] << " created!\n";
+                    if(!strcmp(buffer, "client")){
+                        send_message("OK", socket_accept_fd);
+                    } else if(!strcmp(buffer,"server")){
+                        send_message("OK", socket_accept_fd);
+                        serverFD = socket_accept_fd;
+                    }
+                    cout<<"new client or server connected.\n";
                 }
             }
         }//for
