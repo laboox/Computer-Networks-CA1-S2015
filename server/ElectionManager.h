@@ -34,4 +34,3 @@ public:
 	string parseClientCmd(string order, int box_fd);
 };
 
-string int2str(int n);

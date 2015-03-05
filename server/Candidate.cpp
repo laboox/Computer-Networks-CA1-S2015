@@ -6,14 +6,14 @@
 #include "Candidate.h"
 
 Candidate::Candidate (string name, int code) {
-    this.name = name;
-    this.code = code;
+    this->name = name;
+    this->code = code;
     votes = 0;
 }
 
 void Candidate::save () {
     string addr = path + name + ".txt";
-    ifstream file(addr);
+    ofstream file(addr.c_str());
     file<<name<<endl;
     file<<code<<endl;
     file<<votes<<endl;
@@ -22,12 +22,12 @@ void Candidate::save () {
 
 
 void Candidate::incVote () {
-    vote++;
+    votes++;
     save();
 }
 
 int Candidate::getVote () {
-    return vote;
+    return votes;
 }
 
 int Candidate::getCode () {

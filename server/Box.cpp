@@ -1,9 +1,8 @@
-
 #include "Box.h"
 
 void Box::save () {
-    string addr = path + fileDescriptor + ".txt";
-    ifstream file(addr);
+    string addr=path + int2str(fileDescriptor) + ".txt";
+    ofstream file(addr.c_str(), std::ofstream::out);
     for (int i = 0; i < votes.size(); i++)
     {
     	file<<votes[i].CANDIDATE_CODE<<endl;
@@ -20,14 +19,14 @@ void Box::vote(int candidateCode, string voter)
 		votes.push_back(pii(candidateCode, 1));
 	}
 	else
-		votes[candidateCodes[candidateCode]]++;
+		votes[candidateCodes[candidateCode]].CANDIDATE_VOTES++;
 	voters.push_back(voter);
 	save();
 }
 
-void Box::getVote (int candidateCode)
+int Box::getVote (int candidateCode)
 {
-	return votes[candidateCodes[candidateCode]];
+	return votes[candidateCodes[candidateCode]].CANDIDATE_VOTES;
 }
 
 vector<pii> Box::getVotes ()
@@ -38,4 +37,11 @@ vector<pii> Box::getVotes ()
 vector<string> Box::getVoters()
 {
 	return voters;
+}
+
+string int2str(int n)
+{
+	stringstream s;
+	s<<n;
+	return s.str();
 }

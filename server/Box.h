@@ -15,7 +15,10 @@ public:
     Box (int fd) : fileDescriptor(fd) {}
     void save ();
     void vote(int candidateCode, string voter);
-    void getVote (int candidateCode);
+    int getVote (int candidateCode);
     vector<pii> getVotes ();
     vector<string> getVoters();
 };
+
+
+string int2str(int n);

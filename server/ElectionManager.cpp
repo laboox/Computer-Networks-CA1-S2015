@@ -155,10 +155,3 @@ void ElectionManager::parseClientCmd(string order, int box_fd)
 	else 
 		throw new Exeption("Invalid Command")
 }
-
-string int2str(int n)
-{
-	stringstream s;
-	s<<n;
-	return str(s);
-}
