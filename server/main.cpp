@@ -19,21 +19,21 @@ int main(){
     FD_SET(socketfd,&server);
     max_fd = socketfd;
 
-
-    mkdir("./Candidates")
-
-
+    ElectionManager em = new ElectionManager();
+    /* connect to ca*/
     while(1){
         read_fds = server;
         if(select(max_fd+1,&read_fds,NULL,NULL,NULL) < 0)
             failure("problem in sockets select!");
-        int clinet_fd;
-        for( clinet_fd=0; clinet_fd<=max_fd ; clinet_fd++){
-            if(FD_ISSET(clinet_fd , &read_fds)){
-                if(clinet_fd==0){
-                    // input 
+        int box_fd;
+        for( box_fd=0; box_fd<=max_fd ; box_fd++){
+            if(FD_ISSET(box_fd , &read_fds)){
+                if(box_fd==0){
+                    string order;
+                    getline(cin, order);
+                    parse(order);
                 }
-                else if(clinet_fd!=socketfd){
+                else if(box_fd!=socketfd){
                     unsigned char command[MAX_MSG_SIZE];
                     read(i, command, MAX_MSG_SIZE);
                     parse(command.c_str());
@@ -48,7 +48,7 @@ int main(){
                     FD_SET(socket_accept_fd,&server);
                     if(socket_accept_fd>max_fd)
                         max_fd = socket_accept_fd;
-                    cout<<"new client connected.\n";
+                    cout<<"new election center connected.\n";
                     read(socket_accept_fd,buffer,MAX_MSG_SIZE);
                     //TODO check if user already exist
                     clients[socket_accept_fd] = buffer;

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Header.h"
+#include "Box.h"
+#include "Candidate.h"
 
 #define BOX_FD first
 #define BOX_INDEX second
